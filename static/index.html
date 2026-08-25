@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniGuard AI | Enterprise Responsible AI Control Plane</title>
+  <meta name="description" content="Real-time multi-gate Responsible AI Interception and Intervention Engine with dynamic latency budgets, F-beta alert fatigue tuning, and cryptographic audit trails.">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Navigation Header -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">🛡️</div>
+        <div>
+          <span class="brand-title">OmniGuard AI</span>
+        </div>
+        <span class="brand-badge">Round 2 Control Plane</span>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="playground" id="tab-btn-playground">
+          <span>⚡</span> Live Simulator
+        </button>
+        <button class="nav-tab-btn" data-tab="policy-studio" id="tab-btn-policy">
+          <span>⚙️</span> Policy & F-β Studio
+        </button>
+        <button class="nav-tab-btn" data-tab="hitl-center" id="tab-btn-hitl">
+          <span>⚖️</span> HITL Operations
+          <span class="hitl-badge-count" id="nav-hitl-count">0</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="telemetry" id="tab-btn-telemetry">
+          <span>📊</span> Telemetry & KPIs
+        </button>
+        <button class="nav-tab-btn" data-tab="audit-trail" id="tab-btn-audit">
+          <span>🔒</span> Cryptographic Audit
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn-seed" id="btn-seed-scenarios" title="Seed 5 diverse real-world enterprise scenarios">
+          <span>🧪</span> Run Seed Scenarios
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+
+      <!-- =================================================================== -->
+      <!-- TAB 1: LIVE SIMULATOR & PLAYGROUND -->
+      <!-- =================================================================== -->
+      <section id="view-playground" class="view-section active">
+        
+        <!-- Persona Selector Banner -->
+        <div class="glass-panel persona-banner">
+          <div>
+            <div class="persona-title">Active Enterprise Workload Profile</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Enforces dynamic risk tolerance, F-β sensitivity curves, and millisecond latency budgets.
+            </p>
+          </div>
+          <div class="persona-cards">
+            <div class="persona-card selected" data-persona="customer_support" id="persona-customer">
+              <div class="persona-card-icon">💬</div>
+              <div class="persona-card-text">
+                <span class="persona-card-name">Customer Chatbot</span>
+                <span class="persona-card-meta">Latency &lt;80ms • F1.0 • PII Redact</span>
+              </div>
+            </div>
+            <div class="persona-card" data-persona="internal_copilot" id="persona-copilot">
+              <div class="persona-card-icon">💻</div>
+              <div class="persona-card-text">
+                <span class="persona-card-name">Internal Copilot</span>
+                <span class="persona-card-meta">Precision F0.5 • Secrets • MCP Tools</span>
+              </div>
+            </div>
+            <div class="persona-card" data-persona="regulated_decision" id="persona-regulated">
+              <div class="persona-card-icon">🏛️</div>
+              <div class="persona-card-text">
+                <span class="persona-card-name">Regulated Decision</span>
+                <span class="persona-card-meta">Recall F2.0 • NLI Grounding • HITL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Playground Grid -->
+        <div class="playground-grid">
+          
+          <!-- Request Composer Panel -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span>📝</span> Request & Response Pipeline
+              </div>
+              <div class="preset-selector">
+                <label for="preset-select" style="font-size: 0.75rem; color: var(--text-muted);">Preload Test Case:</label>
+                <select id="preset-select" class="select-dropdown">
+                  <option value="">-- Choose Scenario --</option>
+                  <option value="cs_pii_ungrounded">1. Customer: PII & Fake Discount</option>
+                  <option value="cs_prompt_inj">2. Customer: Jailbreak / DAN Attack</option>
+                  <option value="copilot_secret_mcp">3. Copilot: AWS Secret & MCP Tool Loop</option>
+                  <option value="regulated_bias_credit">4. Regulated: Demographic Attribution Bias</option>
+                  <option value="regulated_clean_dos">5. Regulated: Verified Clinical Advice</option>
+                  <option value="multiturn_priming">6. Multi-Turn: Context Priming Attempt</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="form-label" for="input-prompt">
+                  <span>User Prompt / Input Query</span>
+                  <span style="color: var(--accent-cyan); font-weight: 500; font-size: 0.75rem;">Stage 1 Gate</span>
+                </label>
+                <textarea id="input-prompt" class="form-textarea" rows="3" placeholder="Enter user prompt or instruction..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="input-response">
+                  <span>Proposed LLM Generation (Output Gate)</span>
+                  <span style="color: #f472b6; font-weight: 500; font-size: 0.75rem;">Stage 4 Gate</span>
+                </label>
+                <textarea id="input-response" class="form-textarea" rows="4" placeholder="Proposed response to evaluate before returning to client..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="input-context">
+                  <span>Retrieved Enterprise RAG Context Chunks (Zero-Ground-Truth Grounding)</span>
+                  <span style="color: #34d399; font-weight: 500; font-size: 0.75rem;">Stage 2 Gate</span>
+                </label>
+                <textarea id="input-context" class="form-textarea" rows="3" placeholder="Official source chunks from vector database for NLI entailment..."></textarea>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="input-tool-name">
+                    <span>Agent MCP Tool Call</span>
+                    <span style="color: #fbbf24; font-size: 0.75rem;">Stage 3</span>
+                  </label>
+                  <input type="text" id="input-tool-name" class="form-input" placeholder="e.g. terminate_instance">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="input-demographic">
+                    <span>Demographic Attribute</span>
+                    <span style="color: #a78bfa; font-size: 0.75rem;">Bias Test</span>
+                  </label>
+                  <input type="text" id="input-demographic" class="form-input" placeholder="e.g. Jamal Washington">
+                </div>
+              </div>
+
+              <button class="btn-evaluate" id="btn-run-evaluation">
+                <span>🛡️</span> Intercept & Evaluate Request
+              </button>
+            </div>
+          </div>
+
+          <!-- Evaluation & Inspection Panel -->
+          <div class="glass-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span>🔍</span> OmniGuard Control Plane Telemetry
+              </div>
+              <div id="eval-id-badge" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">
+                Ready
+              </div>
+            </div>
+
+            <div class="panel-body" id="inspection-body">
+              
+              <!-- Placeholder State -->
+              <div id="result-placeholder" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">⚡</div>
+                <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">
+                  Pipeline Standby
+                </div>
+                <p style="font-size: 0.85rem; max-width: 360px; margin: 0 auto;">
+                  Select a preloaded scenario or compose custom prompts to run the 5-stage real-time interception pipeline.
+                </p>
+              </div>
+
+              <!-- Live Output Inspection Container (Hidden by default) -->
+              <div id="result-container" style="display: none;">
+                
+                <!-- Action Banner -->
+                <div class="result-banner" id="result-banner">
+                  <div>
+                    <span class="action-badge action-ALLOW" id="result-action-badge">ALLOW</span>
+                    <div id="result-rationale" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.4rem;">
+                      Passed all safety gates.
+                    </div>
+                  </div>
+                  <div class="risk-gauge-container">
+                    <div class="risk-gauge-label">Composite Risk Index</div>
+                    <div class="risk-score-value" id="result-cri-value" style="color: var(--accent-emerald);">0.00</div>
+                  </div>
+                </div>
+
+                <!-- Latency Breakdown -->
+                <div class="latencies-card">
+                  <div class="lat-item">
+                    <span class="lat-title">Tier 0 (Heuristic)</span>
+                    <span class="lat-value" id="lat-t0">0.0 ms</span>
+                  </div>
+                  <div class="lat-item">
+                    <span class="lat-title">Tier 1 (Fast SLM)</span>
+                    <span class="lat-value" id="lat-t1">0.0 ms</span>
+                  </div>
+                  <div class="lat-item">
+                    <span class="lat-title">Tier 2 (NLI/Bias)</span>
+                    <span class="lat-value" id="lat-t2">0.0 ms</span>
+                  </div>
+                  <div class="lat-item">
+                    <span class="lat-title">Total Overhead</span>
+                    <span class="lat-value" id="lat-total" style="color: #a78bfa;">0.0 ms</span>
+                  </div>
+                </div>
+
+                <!-- Final Dispatched Output Box -->
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Dispatched Output (Sanitized / Intercepted)</span>
+                    <span id="output-status-tag" style="font-size: 0.75rem; color: var(--text-muted);">Modified</span>
+                  </label>
+                  <div class="output-box" id="result-final-text"></div>
+                </div>
+
+                <!-- Cryptographic Proof -->
+                <div style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted); margin-top: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                  <span>Audit SHA-256: <span id="result-audit-hash" style="color: #38bdf8;">--</span></span>
+                  <span id="hitl-escalation-alert" style="color: #f43f5e; font-weight: 600; display: none;">⚖️ Enqueued in HITL</span>
+                </div>
+
+                <!-- Detected Findings List -->
+                <div style="margin-top: 1.25rem;">
+                  <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+                    Risk Findings & Rule Activations (<span id="findings-count">0</span>)
+                  </div>
+                  <div class="findings-container" id="findings-list">
+                    <!-- Dynamic findings inserted here -->
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 2: POLICY & F-BETA STUDIO -->
+      <!-- =================================================================== -->
+      <section id="view-policy-studio" class="view-section">
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Policy-as-Code & F-β Alert Fatigue Tuning</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 900px; line-height: 1.5;">
+            Configure dynamic guardrail policies per enterprise persona. Tune the <strong>F-β optimization curve</strong> 
+            to balance engineer alert fatigue (β &lt; 1.0 prioritizing high precision) against critical regulatory liability (β &gt; 1.0 maximizing recall).
+          </p>
+        </div>
+
+        <div class="policy-grid" id="policies-container">
+          <!-- Dynamic policy cards loaded from backend -->
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 3: HITL OPERATIONS CENTER -->
+      <!-- =================================================================== -->
+      <section id="view-hitl-center" class="view-section">
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem;">Human-in-the-Loop (HITL) Compliance Queue</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Fulfills EU AI Act Article 14 mandatory human oversight for high-risk decisions and ungrounded claims.
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem;" id="hitl-stats-badges">
+            <!-- Review stats badges -->
+          </div>
+        </div>
+
+        <div class="hitl-queue" id="hitl-items-container">
+          <!-- Dynamic HITL cards -->
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 4: REAL-TIME TELEMETRY & KPIS -->
+      <!-- =================================================================== -->
+      <section id="view-telemetry" class="view-section">
+        <div class="stats-grid">
+          <div class="glass-panel stat-card">
+            <span class="stat-title">Total Intercepted Requests</span>
+            <span class="stat-value" id="stat-total-requests">0</span>
+          </div>
+          <div class="glass-panel stat-card">
+            <span class="stat-title">Average Pipeline Latency</span>
+            <span class="stat-value" id="stat-avg-latency" style="color: #38bdf8;">0.0 ms</span>
+          </div>
+          <div class="glass-panel stat-card">
+            <span class="stat-title">Estimated Precision</span>
+            <span class="stat-value" id="stat-precision" style="color: #34d399;">94.0%</span>
+          </div>
+          <div class="glass-panel stat-card">
+            <span class="stat-title">Estimated Recall</span>
+            <span class="stat-value" id="stat-recall" style="color: #a78bfa;">98.0%</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Intervention Actions Breakdown</h3>
+            <div id="telemetry-actions-chart" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Dynamic bars -->
+            </div>
+          </div>
+
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Risk Categories Distribution</h3>
+            <div id="telemetry-risks-chart" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Dynamic bars -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- TAB 5: CRYPTOGRAPHIC AUDIT TRAIL -->
+      <!-- =================================================================== -->
+      <section id="view-audit-trail" class="view-section">
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem;">SHA-256 Immutable Audit Ledger</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Cryptographically chained provenance for full regulatory auditability and tamper detection.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="chain-integrity-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); padding: 0.4rem 0.8rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;">
+              ✓ Chain Validated
+            </span>
+          </div>
+        </div>
+
+        <div class="glass-panel audit-table-wrapper">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Eval ID</th>
+                <th>Workload</th>
+                <th>Action</th>
+                <th>Composite Risk</th>
+                <th>Latency</th>
+                <th>Current SHA-256 Hash</th>
+              </tr>
+            </thead>
+            <tbody id="audit-table-body">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Review Modal for HITL -->
+  <div class="modal-backdrop" id="hitl-modal">
+    <div class="modal-card">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>⚖️</span> Compliance Officer Review
+        </div>
+        <button id="btn-close-modal" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer;">✕</button>
+      </div>
+      <div class="panel-body" id="hitl-modal-body">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
