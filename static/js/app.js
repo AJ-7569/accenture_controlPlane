@@ -84,7 +84,7 @@ function setupNavigation() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-      
+
       btn.classList.add('active');
       const tabId = btn.dataset.tab;
       activeTab = tabId;
@@ -100,18 +100,18 @@ function setupNavigation() {
   // Seed button
   document.getElementById('btn-seed-scenarios').addEventListener('click', async () => {
     const btn = document.getElementById('btn-seed-scenarios');
-    btn.innerHTML = '<span>⏳</span> Seeding...';
+    btn.innerText = 'Seeding…';
     try {
       const res = await fetch('/api/seed-scenarios', { method: 'POST' });
       const data = await res.json();
-      btn.innerHTML = '<span>✓</span> Seeded 5 Cases!';
-      setTimeout(() => { btn.innerHTML = '<span>🧪</span> Run Seed Scenarios'; }, 2000);
+      btn.innerText = 'Seeded 5 cases';
+      setTimeout(() => { btn.innerText = 'Run Seed Scenarios'; }, 2000);
       refreshHITLQueue();
       refreshTelemetry();
       refreshAuditLogs();
     } catch (e) {
       console.error(e);
-      btn.innerHTML = '<span>❌</span> Failed';
+      btn.innerText = 'Seed failed';
     }
   });
 
@@ -140,7 +140,7 @@ function setupPlayground() {
     if (val && PRESETS[val]) {
       const p = PRESETS[val];
       currentPersona = p.persona;
-      
+
       // Update Persona UI
       document.querySelectorAll('.persona-card').forEach(c => {
         c.classList.toggle('selected', c.dataset.persona === p.persona);
@@ -160,7 +160,7 @@ function setupPlayground() {
 // Run Evaluation Pipeline
 async function runEvaluation() {
   const btn = document.getElementById('btn-run-evaluation');
-  btn.innerHTML = '<span>⏳</span> Intercepting Pipeline...';
+  btn.innerText = 'Intercepting pipeline…';
   btn.disabled = true;
 
   const prompt = document.getElementById('input-prompt').value.trim();
@@ -202,7 +202,7 @@ async function runEvaluation() {
     console.error(err);
     alert('Evaluation error: ' + err.message);
   } finally {
-    btn.innerHTML = '<span>🛡️</span> Intercept & Evaluate Request';
+    btn.innerText = 'Intercept & Evaluate Request';
     btn.disabled = false;
   }
 }
@@ -221,16 +221,25 @@ function renderEvaluationResults(data) {
 
   document.getElementById('result-rationale').innerText = data.decision_rationale;
 
-  // CRI Score
+  // CRI Score — animated radial gauge
   const criVal = document.getElementById('result-cri-value');
+  const criScore = Math.max(0, Math.min(1, data.composite_risk_score));
   criVal.innerText = data.composite_risk_score.toFixed(2);
-  if (data.composite_risk_score > 0.6) {
-    criVal.style.color = 'var(--accent-rose)';
-  } else if (data.composite_risk_score > 0.3) {
-    criVal.style.color = 'var(--accent-amber)';
-  } else {
-    criVal.style.color = 'var(--accent-emerald)';
-  }
+
+  let ringColor = 'var(--accent-emerald)';
+  if (data.composite_risk_score > 0.6) ringColor = 'var(--accent-rose)';
+  else if (data.composite_risk_score > 0.3) ringColor = 'var(--accent-amber)';
+  criVal.style.color = ringColor;
+
+  const ringFill = document.getElementById('risk-ring-fill');
+  const circumference = 2 * Math.PI * 24; // matches r=24 in the SVG
+  ringFill.style.strokeDasharray = `${circumference}`;
+  // start from empty, then animate to the target on the next frame for a visible sweep
+  ringFill.style.strokeDashoffset = `${circumference}`;
+  ringFill.style.stroke = ringColor;
+  requestAnimationFrame(() => {
+    ringFill.style.strokeDashoffset = `${circumference * (1 - criScore)}`;
+  });
 
   // Latencies
   document.getElementById('lat-t0').innerText = `${data.latencies.tier0_ms.toFixed(1)} ms`;
@@ -285,23 +294,23 @@ async function loadPolicies() {
     Object.values(policies).forEach(p => {
       const card = document.createElement('div');
       card.className = 'glass-panel';
-      card.style.padding = '1.5rem';
+      card.style.padding = '1.4rem';
       card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
           <div>
-            <h3 style="font-size: 1.05rem; font-weight: 700;">${p.name}</h3>
-            <span style="font-size: 0.75rem; color: var(--accent-cyan); font-family: var(--font-mono);">${p.use_case}</span>
+            <h3 style="font-family: var(--font-display); font-size: 1.02rem; font-weight: 600;">${p.name}</h3>
+            <span style="font-size: 0.72rem; color: var(--accent-cyan); font-family: var(--font-mono);">${p.use_case}</span>
           </div>
-          <span class="brand-badge">${p.latency_budget_ms}ms Budget</span>
+          <span class="brand-badge">${p.latency_budget_ms}ms budget</span>
         </div>
-        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.4;">${p.description}</p>
-        
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.2rem; line-height: 1.4;">${p.description}</p>
+
         <div class="form-group" style="margin-bottom: 1rem;">
           <div class="slider-header">
             <span style="font-weight: 600;">F-β Alert Tuning (Precision vs Recall)</span>
-            <span id="label-fbeta-${p.use_case}" style="font-family: var(--font-mono); color: #38bdf8;">β = ${p.f_beta.toFixed(1)} (${p.f_beta < 1 ? 'Precision-Heavy' : p.f_beta > 1 ? 'Recall-Heavy' : 'Balanced'})</span>
+            <span id="label-fbeta-${p.use_case}" style="font-family: var(--font-mono); color: var(--accent-cyan);">β = ${p.f_beta.toFixed(1)} (${p.f_beta < 1 ? 'Precision-Heavy' : p.f_beta > 1 ? 'Recall-Heavy' : 'Balanced'})</span>
           </div>
-          <input type="range" class="slider-input" min="0.2" max="3.0" step="0.1" value="${p.f_beta}" 
+          <input type="range" class="slider-input" min="0.2" max="3.0" step="0.1" value="${p.f_beta}"
             oninput="updateFBetaLabel('${p.use_case}', this.value)"
             onchange="savePolicyField('${p.use_case}', 'f_beta', parseFloat(this.value))">
         </div>
@@ -309,7 +318,7 @@ async function loadPolicies() {
         <div class="form-group" style="margin-bottom: 1rem;">
           <div class="slider-header">
             <span style="font-weight: 600;">NLI Grounding Min Entailment</span>
-            <span id="label-ground-${p.use_case}" style="font-family: var(--font-mono); color: #34d399;">${(p.grounding_min_entailment * 100).toFixed(0)}%</span>
+            <span id="label-ground-${p.use_case}" style="font-family: var(--font-mono); color: var(--accent-emerald);">${(p.grounding_min_entailment * 100).toFixed(0)}%</span>
           </div>
           <input type="range" class="slider-input" min="0.30" max="0.95" step="0.05" value="${p.grounding_min_entailment}"
             oninput="document.getElementById('label-ground-${p.use_case}').innerText = (this.value*100).toFixed(0) + '%'"
@@ -319,7 +328,7 @@ async function loadPolicies() {
         <div class="form-group" style="margin-bottom: 1rem;">
           <div class="slider-header">
             <span style="font-weight: 600;">HITL Escalation Threshold</span>
-            <span id="label-hitl-${p.use_case}" style="font-family: var(--font-mono); color: #f43f5e;">CRI ≥ ${p.hitl_escalation_threshold.toFixed(2)}</span>
+            <span id="label-hitl-${p.use_case}" style="font-family: var(--font-mono); color: var(--accent-rose);">CRI ≥ ${p.hitl_escalation_threshold.toFixed(2)}</span>
           </div>
           <input type="range" class="slider-input" min="0.20" max="0.95" step="0.05" value="${p.hitl_escalation_threshold}"
             oninput="document.getElementById('label-hitl-${p.use_case}').innerText = 'CRI ≥ ' + parseFloat(this.value).toFixed(2)"
@@ -371,16 +380,16 @@ async function refreshHITLQueue() {
     // Render stats badges
     const statsContainer = document.getElementById('hitl-stats-badges');
     statsContainer.innerHTML = `
-      <span class="hash-pill" style="color: #34d399;">Resolved: ${stats.total_reviews}</span>
-      <span class="hash-pill" style="color: #38bdf8;">Approved: ${(stats.approved_rate * 100).toFixed(0)}%</span>
-      <span class="hash-pill" style="color: #f43f5e;">Rejected: ${(stats.rejected_rate * 100).toFixed(0)}%</span>
+      <span class="hash-pill" style="color: var(--accent-emerald);">Resolved: ${stats.total_reviews}</span>
+      <span class="hash-pill" style="color: var(--accent-cyan);">Approved: ${(stats.approved_rate * 100).toFixed(0)}%</span>
+      <span class="hash-pill" style="color: var(--accent-rose);">Rejected: ${(stats.rejected_rate * 100).toFixed(0)}%</span>
     `;
 
     const container = document.getElementById('hitl-items-container');
     container.innerHTML = '';
 
     if (items.length === 0) {
-      container.innerHTML = '<div class="glass-panel" style="padding: 2rem; text-align: center; color: var(--text-muted);">No compliance review tickets. All pipeline transactions cleared!</div>';
+      container.innerHTML = '<div class="glass-panel" style="padding: 2rem; text-align: center; color: var(--text-muted);">No compliance review tickets. All pipeline transactions cleared.</div>';
       return;
     }
 
@@ -394,17 +403,17 @@ async function refreshHITLQueue() {
             <span class="persona-card-meta">${new Date(item.timestamp * 1000).toLocaleTimeString()}</span>
             <span class="action-badge action-${item.status === 'PENDING' ? 'ESCALATE_HITL' : item.status === 'APPROVED' ? 'ALLOW' : 'INTERCEPT_FALLBACK'}">${item.status}</span>
           </div>
-          <div style="font-family: var(--font-mono); font-weight: 700; color: #f43f5e;">
+          <div style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-rose);">
             CRI Score: ${item.composite_risk_score.toFixed(2)}
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
-          <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: var(--radius-md);">
+          <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
             <div style="color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Prompt:</div>
             <div>${escapeHtml(item.prompt)}</div>
           </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: var(--radius-md);">
+          <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
             <div style="color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Proposed Response:</div>
             <div>${escapeHtml(item.proposed_response)}</div>
           </div>
@@ -416,8 +425,8 @@ async function refreshHITLQueue() {
 
         ${item.status === 'PENDING' ? `
           <div class="hitl-actions">
-            <button class="btn-approve" onclick="openReviewModal('${item.item_id}', 'APPROVE')">✓ Approve & Release</button>
-            <button class="btn-reject" onclick="openReviewModal('${item.item_id}', 'REJECT')">✕ Reject & Block</button>
+            <button class="btn-approve" onclick="openReviewModal('${item.item_id}', 'APPROVE')">Approve &amp; release</button>
+            <button class="btn-reject" onclick="openReviewModal('${item.item_id}', 'REJECT')">Reject &amp; block</button>
           </div>
         ` : `
           <div style="font-size: 0.8rem; color: var(--accent-emerald);">
@@ -501,12 +510,12 @@ async function refreshTelemetry() {
       const pct = ((count / total) * 100).toFixed(1);
       const row = document.createElement('div');
       row.innerHTML = `
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.2rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
           <span>${action.replace(/_/g, ' ')}</span>
           <span style="font-family: var(--font-mono);">${count} (${pct}%)</span>
         </div>
-        <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden;">
-          <div style="width: ${pct}%; height: 100%; background: var(--accent-primary); border-radius: 4px;"></div>
+        <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden;">
+          <div style="width: ${pct}%; height: 100%; background: var(--accent-primary); border-radius: 3px;"></div>
         </div>
       `;
       actionsContainer.appendChild(row);
@@ -518,12 +527,12 @@ async function refreshTelemetry() {
     Object.entries(data.risk_category_counts).forEach(([cat, count]) => {
       const row = document.createElement('div');
       row.innerHTML = `
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.2rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
           <span>${cat.replace(/_/g, ' ')}</span>
-          <span style="font-family: var(--font-mono); color: #38bdf8;">${count}</span>
+          <span style="font-family: var(--font-mono); color: var(--accent-cyan);">${count}</span>
         </div>
-        <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden;">
-          <div style="width: ${Math.min(100, count * 15)}%; height: 100%; background: var(--accent-amber); border-radius: 4px;"></div>
+        <div style="width: 100%; height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden;">
+          <div style="width: ${Math.min(100, count * 15)}%; height: 100%; background: var(--accent-amber); border-radius: 3px;"></div>
         </div>
       `;
       risksContainer.appendChild(row);
@@ -542,14 +551,14 @@ async function refreshAuditLogs() {
 
     const badge = document.getElementById('chain-integrity-badge');
     if (data.chain_integrity_valid) {
-      badge.style.background = 'rgba(16, 185, 129, 0.2)';
-      badge.style.color = '#34d399';
-      badge.style.borderColor = 'rgba(16, 185, 129, 0.5)';
-      badge.innerText = '✓ SHA-256 Chain Mathematically Validated';
+      badge.style.background = 'rgba(95, 227, 160, 0.1)';
+      badge.style.color = 'var(--accent-emerald)';
+      badge.style.borderColor = 'rgba(95, 227, 160, 0.4)';
+      badge.innerText = 'SHA-256 chain mathematically validated';
     } else {
-      badge.style.background = 'rgba(244, 63, 94, 0.2)';
-      badge.style.color = '#fb7185';
-      badge.innerText = '⚠️ Chain Tamper Detected';
+      badge.style.background = 'rgba(255, 107, 106, 0.1)';
+      badge.style.color = 'var(--accent-rose)';
+      badge.innerText = 'Chain tamper detected';
     }
 
     const tbody = document.getElementById('audit-table-body');
@@ -566,7 +575,7 @@ async function refreshAuditLogs() {
         <td>${new Date(e.timestamp * 1000).toLocaleTimeString()}</td>
         <td><span class="hash-pill">${e.entry_id}</span></td>
         <td>${e.use_case}</td>
-        <td><span class="action-badge action-${e.action}" style="font-size: 0.75rem;">${e.action}</span></td>
+        <td><span class="action-badge action-${e.action}" style="font-size: 0.72rem;">${e.action}</span></td>
         <td style="font-weight: 700; color: ${e.composite_risk > 0.5 ? 'var(--accent-rose)' : 'var(--accent-emerald)'};">${e.composite_risk.toFixed(2)}</td>
         <td>${e.total_latency_ms.toFixed(1)} ms</td>
         <td><span class="hash-pill">${e.current_hash.substring(0, 16)}...</span></td>
